@@ -21,6 +21,8 @@ type gameScreen struct {
 	timer   int
 	scope   *scope.Scope
 
+	Shots []model.Shot
+
 	changeScreenFunc func(config.ScreenType)
 }
 
@@ -73,8 +75,90 @@ func (gs *gameScreen) Update() error {
 		gs.Player.Up()
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		gs.Shot()
+	}
+
+	gs.moveShots()
+
+	gs.killEnemy()
+
 	gs.timer++
 	return nil
+}
+
+func (gs *gameScreen) moveShots() {
+
+	for i := range gs.Shots {
+		gs.Shots[i].Move()
+
+	}
+
+	shots := []model.Shot{}
+
+	for i, shot := range gs.Shots {
+		if gs.Shots[i].IsNeedDelete() {
+			continue
+		}
+
+		shots = append(shots, shot)
+	}
+
+	gs.Shots = shots
+
+}
+
+func (gs *gameScreen) killEnemy() {
+
+	deleteShotsIndex := []int{}
+	deleteEnemiesIndex := []int{}
+
+	for i, enemy := range gs.Enemies {
+		for j, shot := range gs.Shots {
+			if enemy.IsKill(shot) {
+				deleteShotsIndex = append(deleteShotsIndex, j)
+				deleteEnemiesIndex = append(deleteEnemiesIndex, i)
+				gs.scope.Value++
+			}
+		}
+	}
+
+	shots := []model.Shot{}
+	enemies := []model.Enemy{}
+
+	for i, shot := range gs.Shots {
+		isNeedDelete := false
+		for _, di := range deleteShotsIndex {
+			if di == i {
+				isNeedDelete = true
+			}
+		}
+
+		if !isNeedDelete {
+			shots = append(shots, shot)
+		}
+	}
+
+	for i, enemy := range gs.Enemies {
+		isNeedDelete := false
+		for _, di := range deleteEnemiesIndex {
+			if di == i {
+				isNeedDelete = true
+			}
+		}
+
+		if !isNeedDelete {
+			enemies = append(enemies, enemy)
+		}
+	}
+
+	gs.Enemies = enemies
+
+	for range deleteEnemiesIndex {
+		gs.Enemies = append(gs.Enemies, model.NewEnemy())
+	}
+	gs.Shots = shots
+
 }
 
 func (gs *gameScreen) Draw(
@@ -87,6 +171,7 @@ func (gs *gameScreen) Draw(
 	pointSize := float32(config.PointSize)
 
 	gs.DrawPlayer(screenH)
+	gs.DrawShots(screenH)
 
 	for _, enemy := range gs.Enemies {
 		vector.FillRect(screenH, float32(enemy.X)*pointSize, float32(enemy.Y)*pointSize, pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
@@ -94,6 +179,28 @@ func (gs *gameScreen) Draw(
 
 	scoreText := "Score: " + strconv.Itoa(gs.scope.Value)
 	text.Draw(screenH, scoreText, config.GameFont, 10, 30, color.White)
+}
+
+func (gs *gameScreen) Shot() {
+	gs.Shots = append(gs.Shots, model.NewShot(gs.Player))
+}
+
+func (gs *gameScreen) DrawShots(
+	screenH *ebiten.Image,
+) {
+
+	for _, shot := range gs.Shots {
+		vector.FillRect(
+			screenH,
+			float32(shot.X),
+			float32(shot.Y),
+			float32(config.ShotSize),
+			float32(config.ShotSize),
+			color.RGBA{0xFF, 0xFF, 0xFF, 0x00},
+			false,
+		)
+
+	}
 }
 
 func (gs *gameScreen) DrawPlayer(

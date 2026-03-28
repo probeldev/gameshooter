@@ -72,3 +72,18 @@ func (e *Enemy) Down() {
 	}
 	e.Y++
 }
+
+func (e *Enemy) IsKill(shot Shot) bool {
+	enemyStartX := e.X * config.PointSize
+	enemyEndX := (e.X + 1) * config.PointSize
+
+	enemyStartY := e.Y * config.PointSize
+	enemyEndY := (e.Y + 1) * config.PointSize
+
+	if shot.X > enemyStartX && shot.X < enemyEndX &&
+		shot.Y > enemyStartY && shot.Y < enemyEndY {
+		return true
+	}
+
+	return false
+}
