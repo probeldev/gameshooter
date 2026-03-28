@@ -2,13 +2,24 @@ package model
 
 import "github.com/probeldev/gameshooter/config"
 
+type GunPositionType int
+
+const (
+	GunPositionTypeTop    = 1
+	GunPositionTypeBottom = 2
+	GunPositionTypeLeft   = 3
+	GunPositionTypeRight  = 4
+)
+
 type Player struct {
-	X int
-	Y int
+	X           int
+	Y           int
+	GunPosition GunPositionType
 }
 
 func NewPlayer() Player {
 	p := Player{}
+	p.GunPosition = GunPositionTypeTop
 
 	p.setSpawnPosition()
 
@@ -25,6 +36,8 @@ func (p *Player) Left() {
 		return
 	}
 	p.X--
+
+	p.GunPosition = GunPositionTypeLeft
 }
 
 func (p *Player) Right() {
@@ -32,6 +45,8 @@ func (p *Player) Right() {
 		return
 	}
 	p.X++
+
+	p.GunPosition = GunPositionTypeRight
 }
 
 func (p *Player) Up() {
@@ -39,6 +54,8 @@ func (p *Player) Up() {
 		return
 	}
 	p.Y--
+
+	p.GunPosition = GunPositionTypeTop
 }
 
 func (p *Player) Down() {
@@ -47,4 +64,6 @@ func (p *Player) Down() {
 		return
 	}
 	p.Y++
+
+	p.GunPosition = GunPositionTypeBottom
 }

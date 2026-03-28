@@ -32,6 +32,8 @@ func init() {
 }
 
 func main() {
+	config.CheckConfig()
+
 	ebiten.SetWindowSize(config.WindowWidth, config.WindowHeight)
 	ebiten.SetWindowTitle("My Shooter Game")
 	if err := ebiten.RunGame(game.NewGame()); err != nil {

@@ -86,7 +86,7 @@ func (gs *gameScreen) Draw(
 
 	pointSize := float32(config.PointSize)
 
-	vector.FillRect(screenH, float32(gs.Player.X)*pointSize, float32(gs.Player.Y)*pointSize, pointSize, pointSize, color.RGBA{0x00, 0xFF, 0x00, 0xff}, false)
+	gs.DrawPlayer(screenH)
 
 	for _, enemy := range gs.Enemies {
 		vector.FillRect(screenH, float32(enemy.X)*pointSize, float32(enemy.Y)*pointSize, pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
@@ -94,6 +94,41 @@ func (gs *gameScreen) Draw(
 
 	scoreText := "Score: " + strconv.Itoa(gs.scope.Value)
 	text.Draw(screenH, scoreText, config.GameFont, 10, 30, color.White)
+}
+
+func (gs *gameScreen) DrawPlayer(
+	screenH *ebiten.Image,
+) {
+
+	pointSize := float32(config.PointSize)
+
+	playerStartX := float32(gs.Player.X) * pointSize
+	playerStartY := float32(gs.Player.Y) * pointSize
+
+	var gunPositionX float32 = 0
+	var gunPositionY float32 = 0
+
+	gunSize := float32(config.GunSize)
+
+	switch gs.Player.GunPosition {
+	case model.GunPositionTypeTop:
+		gunPositionX = playerStartX + (pointSize/2 - config.GunSize/2)
+		gunPositionY = playerStartY
+	case model.GunPositionTypeBottom:
+		gunPositionX = playerStartX + (pointSize/2 - config.GunSize/2)
+		gunPositionY = playerStartY + pointSize - gunSize
+	case model.GunPositionTypeLeft:
+		gunPositionY = playerStartY + (pointSize/2 - config.GunSize/2)
+		gunPositionX = playerStartX
+	case model.GunPositionTypeRight:
+		gunPositionY = playerStartY + (pointSize/2 - config.GunSize/2)
+		gunPositionX = playerStartX + pointSize - gunSize
+	}
+
+	vector.FillRect(screenH, playerStartX, playerStartY, pointSize, pointSize, color.RGBA{0xFF, 0xFF, 0x00, 0x00}, false)
+
+	vector.FillRect(screenH, gunPositionX, gunPositionY, gunSize, gunSize, color.RGBA{0x00, 0xFF, 0xFF, 0xff}, false)
+
 }
 
 func (gs *gameScreen) needsToMoveEnemy() bool {
