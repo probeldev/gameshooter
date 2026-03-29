@@ -4,20 +4,20 @@ import (
 	"github.com/probeldev/gameshooter/config"
 )
 
-type DirectionType int
+type DirectionShotType int
 
 const (
-	DirectionTypeTop    DirectionType = 1
-	DirectionTypeBottom DirectionType = 2
-	DirectionTypeLeft   DirectionType = 3
-	DirectionTypeRight  DirectionType = 4
+	DirectionTypeTop    DirectionShotType = 1
+	DirectionTypeBottom DirectionShotType = 2
+	DirectionTypeLeft   DirectionShotType = 3
+	DirectionTypeRight  DirectionShotType = 4
 )
 
 type Shot struct {
 	X int
 	Y int
 
-	Direction DirectionType
+	Direction DirectionShotType
 }
 
 func NewShot(player Player) Shot {

@@ -17,6 +17,8 @@ const (
 	ShotSpeed = 15
 	ShotDelay = 10
 
+	MegaShotSpeed = 15
+
 	CountPointX = WindowWidth / PointSize
 	CountPointY = WindowHeight / PointSize
 )

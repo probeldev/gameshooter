@@ -23,6 +23,8 @@ type gameScreen struct {
 
 	Shots []model.Shot
 
+	MegaShot []model.MegaShot
+
 	changeScreenFunc func(config.ScreenType)
 }
 
@@ -78,16 +80,18 @@ func (gs *gameScreen) Update() error {
 		gs.Player.Up()
 	}
 
-	// if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
-	// 	gs.Shot()
-	// }
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		gs.MegaShotRun()
+	}
 	if gs.needsToShot() {
 		gs.Shot()
 	}
 
 	gs.moveShots()
+	gs.moveMegaShot()
 
-	gs.killEnemy()
+	gs.killEnemyShot()
+	gs.killEnemyMegaMegaShot()
 
 	gs.timer++
 	return nil
@@ -113,14 +117,90 @@ func (gs *gameScreen) moveShots() {
 
 }
 
-func (gs *gameScreen) killEnemy() {
+func (gs *gameScreen) moveMegaShot() {
+
+	for i := range gs.MegaShot {
+		gs.MegaShot[i].Move()
+	}
+
+	shots := []model.MegaShot{}
+
+	for i, shot := range gs.MegaShot {
+		if gs.MegaShot[i].IsNeedDelete() {
+			continue
+		}
+
+		shots = append(shots, shot)
+	}
+
+	gs.MegaShot = shots
+
+}
+
+func (gs *gameScreen) killEnemyMegaMegaShot() {
+
+	deleteShotsIndex := []int{}
+	deleteEnemiesIndex := []int{}
+
+	for i, enemy := range gs.Enemies {
+		for j, shot := range gs.MegaShot {
+			if enemy.IsKillMegaShot(shot) {
+				deleteShotsIndex = append(deleteShotsIndex, j)
+				deleteEnemiesIndex = append(deleteEnemiesIndex, i)
+				gs.scope.Value++
+			}
+		}
+	}
+
+	shots := []model.MegaShot{}
+	enemies := []model.Enemy{}
+
+	for i, shot := range gs.MegaShot {
+		isNeedDelete := false
+		for _, di := range deleteShotsIndex {
+			if di == i {
+				isNeedDelete = true
+			}
+		}
+
+		if !isNeedDelete {
+			shots = append(shots, shot)
+		}
+	}
+
+	for i, enemy := range gs.Enemies {
+		isNeedDelete := false
+		for _, di := range deleteEnemiesIndex {
+			if di == i {
+				isNeedDelete = true
+			}
+		}
+
+		if !isNeedDelete {
+			enemies = append(enemies, enemy)
+		}
+	}
+
+	gs.Enemies = enemies
+
+	for range deleteEnemiesIndex {
+		gs.Enemies = append(
+			gs.Enemies,
+			model.NewEnemy(gs.Player),
+		)
+	}
+	gs.MegaShot = shots
+
+}
+
+func (gs *gameScreen) killEnemyShot() {
 
 	deleteShotsIndex := []int{}
 	deleteEnemiesIndex := []int{}
 
 	for i, enemy := range gs.Enemies {
 		for j, shot := range gs.Shots {
-			if enemy.IsKill(shot) {
+			if enemy.IsKillShot(shot) {
 				deleteShotsIndex = append(deleteShotsIndex, j)
 				deleteEnemiesIndex = append(deleteEnemiesIndex, i)
 				gs.scope.Value++
@@ -180,6 +260,7 @@ func (gs *gameScreen) Draw(
 
 	gs.DrawPlayer(screenH)
 	gs.DrawShots(screenH)
+	gs.DrawMegaShot(screenH)
 
 	for _, enemy := range gs.Enemies {
 		vector.FillRect(screenH, float32(enemy.X)*pointSize, float32(enemy.Y)*pointSize, pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
@@ -193,6 +274,11 @@ func (gs *gameScreen) Shot() {
 	gs.Shots = append(gs.Shots, model.NewShot(gs.Player))
 }
 
+func (gs *gameScreen) MegaShotRun() {
+	// TODO: Перезаписывает предыдущий MegaShot, стоит переделать.
+	gs.MegaShot = model.NewMegaShotFull(gs.Player)
+}
+
 func (gs *gameScreen) DrawShots(
 	screenH *ebiten.Image,
 ) {
@@ -204,6 +290,21 @@ func (gs *gameScreen) DrawShots(
 			float32(config.ShotSize),
 			float32(config.ShotSize),
 			color.RGBA{0xFF, 0xFF, 0xFF, 0xFF},
+			false,
+		)
+	}
+}
+func (gs *gameScreen) DrawMegaShot(
+	screenH *ebiten.Image,
+) {
+	for _, shot := range gs.MegaShot {
+		vector.FillRect(
+			screenH,
+			float32(shot.X),
+			float32(shot.Y),
+			float32(config.ShotSize),
+			float32(config.ShotSize),
+			color.RGBA{0xFF, 0xFF, 0x00, 0xFF},
 			false,
 		)
 	}
