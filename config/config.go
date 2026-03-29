@@ -7,13 +7,14 @@ import (
 )
 
 const (
-	PointSize    = 40
+	PlayerSize   = 40
+	EnemySize    = 40
 	GunSize      = 10
 	ShotSize     = 10
 	WindowWidth  = 1280
 	WindowHeight = 860
 
-	MoveEnemyPixel = 2
+	MoveEnemyPixel = 1
 
 	ShotSpeed = 15
 	ShotDelay = 10
@@ -21,8 +22,8 @@ const (
 	MegaShotSpeed = 15
 	MegaShotDelay = 120
 
-	CountPointX = WindowWidth / PointSize
-	CountPointY = WindowHeight / PointSize
+	CountPointX = WindowWidth / PlayerSize
+	CountPointY = WindowHeight / PlayerSize
 )
 
 var GameFont font.Face
@@ -38,7 +39,7 @@ const (
 const CountEnemies = 10
 
 func CheckConfig() {
-	if PointSize%2 != 0 {
+	if PlayerSize%2 != 0 {
 		log.Panic("PointSize может быть только четным")
 	}
 
@@ -46,7 +47,7 @@ func CheckConfig() {
 		log.Panic("GunSize может быть только четным")
 	}
 
-	if PointSize <= GunSize {
+	if PlayerSize <= GunSize {
 		log.Panic("PointSize не может быть меньше или равным GunSize")
 	}
 
@@ -54,7 +55,7 @@ func CheckConfig() {
 		log.Panic("ShotSize может быть только четным")
 	}
 
-	if PointSize <= ShotSize {
+	if PlayerSize <= ShotSize {
 		log.Panic("PointSize не может быть меньше или равным ShotSize")
 	}
 }

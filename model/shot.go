@@ -26,7 +26,7 @@ func NewShot(player Player) Shot {
 	var shotPositionX int = 0
 	var shotPositionY int = 0
 
-	pointSize := config.PointSize
+	pointSize := config.PlayerSize
 
 	shotSize := config.GunSize
 	playerStartX := player.X * pointSize

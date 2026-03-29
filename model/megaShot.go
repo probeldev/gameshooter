@@ -1,8 +1,6 @@
 package model
 
 import (
-	"log"
-
 	"github.com/probeldev/gameshooter/config"
 )
 
@@ -44,7 +42,7 @@ func NewMegaShot(
 
 	s.Direction = direction
 
-	pointSize := config.PointSize
+	pointSize := config.PlayerSize
 
 	shotSize := config.GunSize
 	playerStartX := player.X * pointSize
@@ -76,7 +74,6 @@ func NewMegaShot(
 }
 
 func (s *MegaShot) Move() {
-	log.Println("MegaShot:Move 1", s)
 	switch s.Direction {
 	case DirectionMegaShotTypeTop:
 		s.Y -= config.MegaShotSpeed
@@ -87,7 +84,6 @@ func (s *MegaShot) Move() {
 	case DirectionMegaShotTypeRight:
 		s.X += config.MegaShotSpeed
 	}
-	log.Println("MegaShot:Move 2", s)
 }
 
 func (s *MegaShot) IsNeedDelete() bool {

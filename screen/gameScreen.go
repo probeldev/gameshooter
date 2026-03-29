@@ -2,7 +2,6 @@ package screen
 
 import (
 	"image/color"
-	"math"
 	"strconv"
 
 	"github.com/probeldev/gameshooter/config"
@@ -49,7 +48,7 @@ func (gs *gameScreen) createEnemies() {
 	for range config.CountEnemies {
 		gs.Enemies = append(
 			gs.Enemies,
-			model.NewEnemy(gs.Player),
+			gs.CreateEnemy(),
 		)
 	}
 
@@ -187,7 +186,7 @@ func (gs *gameScreen) killEnemyMegaMegaShot() {
 	for range deleteEnemiesIndex {
 		gs.Enemies = append(
 			gs.Enemies,
-			model.NewEnemy(gs.Player),
+			gs.CreateEnemy(),
 		)
 	}
 	gs.MegaShot = shots
@@ -243,11 +242,36 @@ func (gs *gameScreen) killEnemyShot() {
 	for range deleteEnemiesIndex {
 		gs.Enemies = append(
 			gs.Enemies,
-			model.NewEnemy(gs.Player),
+			gs.CreateEnemy(),
 		)
 	}
 	gs.Shots = shots
 
+}
+
+func (gs *gameScreen) CreateEnemy() model.Enemy {
+
+	moved := model.NewEnemy(gs.Player)
+
+	collided := false
+	for _, other := range gs.Enemies {
+
+		// AABB проверка пересечения (целочисленная)
+		if moved.X < other.X+config.PlayerSize &&
+			moved.X+config.PlayerSize > other.X &&
+			moved.Y < other.Y+config.PlayerSize &&
+			moved.Y+config.PlayerSize > other.Y {
+			collided = true
+			break
+		}
+	}
+
+	// Если коллизия — пересоздаем
+	if collided {
+		return gs.CreateEnemy()
+	}
+
+	return moved
 }
 
 func (gs *gameScreen) Draw(
@@ -279,9 +303,17 @@ func (gs *gameScreen) MegaShotRun() {
 func (gs *gameScreen) DrawEnemies(
 	screenH *ebiten.Image,
 ) {
-	pointSize := float32(config.PointSize)
+	enemySize := float32(config.EnemySize)
 	for _, enemy := range gs.Enemies {
-		vector.FillRect(screenH, float32(enemy.X), float32(enemy.Y), pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
+		vector.FillRect(
+			screenH,
+			float32(enemy.X),
+			float32(enemy.Y),
+			enemySize,
+			enemySize,
+			color.RGBA{0xFF, 0x00, 0x00, 0xff},
+			false,
+		)
 	}
 }
 
@@ -320,7 +352,7 @@ func (gs *gameScreen) DrawPlayer(
 	screenH *ebiten.Image,
 ) {
 
-	pointSize := float32(config.PointSize)
+	pointSize := float32(config.PlayerSize)
 
 	playerStartX := float32(gs.Player.X) * pointSize
 	playerStartY := float32(gs.Player.Y) * pointSize
@@ -360,29 +392,40 @@ func (gs *gameScreen) needsToMegaShot() bool {
 }
 
 func (gs *gameScreen) isStopGame() bool {
+	// Вычисляем границы игрока один раз перед циклом
+	playerStartX := gs.Player.X * config.PlayerSize
+	playerEndX := gs.Player.X*config.PlayerSize + config.PlayerSize
+	playerStartY := gs.Player.Y * config.PlayerSize
+	playerEndY := gs.Player.Y*config.PlayerSize + config.PlayerSize
 
 	for _, enemy := range gs.Enemies {
+		enemyStartX := enemy.X
+		enemyEndX := enemy.X + config.EnemySize
+		enemyStartY := enemy.Y
+		enemyEndY := enemy.Y + config.EnemySize
 
-		// TODO:переделать, сейчас не работает. т.к. враги ходят не по клеткам
-		deltaX := gs.Player.X - enemy.X/60
-		deltaY := gs.Player.Y - enemy.Y/60
-
-		if deltaX == 0 && deltaY == 0 {
+		// Проверка пересечения двух прямоугольников (AABB collision)
+		// Прямоугольники НЕ пересекаются, если один из них:
+		// - полностью слева, справа, сверху или снизу от другого
+		// Значит, пересекаются, если это условие ложно
+		if playerStartX < enemyEndX &&
+			playerEndX > enemyStartX &&
+			playerStartY < enemyEndY &&
+			playerEndY > enemyStartY {
 			return true
 		}
-
 	}
 
 	return false
 }
 
 func (gs *gameScreen) moveEnemy() {
-
 	for i := range gs.Enemies {
-		deltaX := gs.Player.X - gs.Enemies[i].X/config.PointSize
-		deltaY := gs.Player.Y - gs.Enemies[i].Y/config.PointSize
+		deltaX := gs.Player.X*config.PlayerSize - gs.Enemies[i].X
+		deltaY := gs.Player.Y*config.PlayerSize - gs.Enemies[i].Y
 
-		if math.Abs(float64(deltaX)) > math.Abs(float64(deltaY)) {
+		// Двигаем по оси с наибольшей разницей
+		if abs(deltaX) > abs(deltaY) {
 			if deltaX > 0 {
 				gs.Enemies[i].Right()
 			} else if deltaX < 0 {
@@ -396,20 +439,36 @@ func (gs *gameScreen) moveEnemy() {
 			}
 		}
 
-		// Если эта координата уже занята другим врагом - возвращаем предыдущую позицию
-		// TODO: Сейчас эта логика не работает.
-		for j, enemy := range gs.Enemies {
+		// Проверяем коллизию с другими врагами
+		moved := &gs.Enemies[i]
+		collided := false
+
+		for j, other := range gs.Enemies {
 			if i == j {
 				continue
 			}
 
-			if enemy.X == gs.Enemies[i].X &&
-				enemy.Y == gs.Enemies[i].Y {
-				gs.Enemies[i].BackMove()
+			// AABB проверка пересечения (целочисленная)
+			if moved.X < other.X+config.PlayerSize &&
+				moved.X+config.PlayerSize > other.X &&
+				moved.Y < other.Y+config.PlayerSize &&
+				moved.Y+config.PlayerSize > other.Y {
+				collided = true
+				break
 			}
-
 		}
 
+		// Если коллизия — отменяем движение
+		if collided {
+			gs.Enemies[i].BackMove()
+		}
 	}
+}
 
+// Вспомогательная функция для abs(int), чтобы не тащить math.Abs для float64
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
 }

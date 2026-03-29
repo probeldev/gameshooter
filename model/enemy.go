@@ -107,11 +107,12 @@ func (e *Enemy) BackMove() {
 }
 
 func (e *Enemy) IsKillShot(shot Shot) bool {
+	// TODO: реализовать проверку через ААББ колизию
 	enemyStartX := e.X
-	enemyEndX := (e.X + config.PointSize)
+	enemyEndX := (e.X + config.PlayerSize)
 
 	enemyStartY := e.Y
-	enemyEndY := (e.Y + config.PointSize)
+	enemyEndY := (e.Y + config.PlayerSize)
 
 	if shot.X > enemyStartX && shot.X < enemyEndX &&
 		shot.Y > enemyStartY && shot.Y < enemyEndY {
@@ -122,11 +123,12 @@ func (e *Enemy) IsKillShot(shot Shot) bool {
 }
 
 func (e *Enemy) IsKillMegaShot(shot MegaShot) bool {
+	// TODO: реализовать проверку через ААББ колизию
 	enemyStartX := e.X
-	enemyEndX := e.X + config.PointSize
+	enemyEndX := e.X + config.PlayerSize
 
 	enemyStartY := e.Y
-	enemyEndY := e.Y + config.PointSize
+	enemyEndY := e.Y + config.PlayerSize
 
 	if shot.X > enemyStartX && shot.X < enemyEndX &&
 		shot.Y > enemyStartY && shot.Y < enemyEndY {
