@@ -7,8 +7,10 @@ import (
 )
 
 type Enemy struct {
-	X int
-	Y int
+	X     int
+	Y     int
+	PrevX int
+	PrevY int
 }
 
 func NewEnemy(
@@ -61,6 +63,7 @@ func (e *Enemy) setSpawnPosition(
 }
 
 func (e *Enemy) Left() {
+	e.savePrev()
 	if e.X == 0 {
 		return
 	}
@@ -68,6 +71,7 @@ func (e *Enemy) Left() {
 }
 
 func (e *Enemy) Right() {
+	e.savePrev()
 	if e.X == config.CountPointX-1 {
 		return
 	}
@@ -75,6 +79,7 @@ func (e *Enemy) Right() {
 }
 
 func (e *Enemy) Up() {
+	e.savePrev()
 	if e.Y == 0 {
 		return
 	}
@@ -82,11 +87,24 @@ func (e *Enemy) Up() {
 }
 
 func (e *Enemy) Down() {
+	e.savePrev()
 	if e.Y == config.CountPointY-1 {
 
 		return
 	}
 	e.Y++
+}
+
+func (e *Enemy) savePrev() {
+	e.PrevX = e.X
+	e.PrevY = e.Y
+}
+
+func (e *Enemy) BackMove() {
+	// Возвращается на предыдущую позицию
+
+	e.X = e.PrevX
+	e.Y = e.PrevY
 }
 
 func (e *Enemy) IsKill(shot Shot) bool {

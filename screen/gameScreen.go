@@ -262,7 +262,7 @@ func (gs *gameScreen) isStopGame() bool {
 }
 
 func (gs *gameScreen) moveEnemy() {
-	// TODO:  Сделать что бы несколько врагов не занимало одну клеточку.
+
 	for i := range gs.Enemies {
 		deltaX := gs.Player.X - gs.Enemies[i].X
 		deltaY := gs.Player.Y - gs.Enemies[i].Y
@@ -279,6 +279,19 @@ func (gs *gameScreen) moveEnemy() {
 			} else if deltaY < 0 {
 				gs.Enemies[i].Up()
 			}
+		}
+
+		// Если эта координата уже занята другим врагом - возвращаем предыдущую позицию
+		for j, enemy := range gs.Enemies {
+			if i == j {
+				continue
+			}
+
+			if enemy.X == gs.Enemies[i].X &&
+				enemy.Y == gs.Enemies[i].Y {
+				gs.Enemies[i].BackMove()
+			}
+
 		}
 
 	}
