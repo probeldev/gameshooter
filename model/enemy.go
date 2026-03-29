@@ -11,19 +11,35 @@ type Enemy struct {
 	Y int
 }
 
-func NewEnemy() Enemy {
+func NewEnemy(
+	player Player,
+) Enemy {
 	e := Enemy{}
-	e.setSpawnPosition()
+	e.setSpawnPosition(player)
 
 	return e
 }
 
-func (e *Enemy) setSpawnPosition() {
-	positions := []string{
-		"left",
-		"right",
-		"top",
-		"bottom",
+func (e *Enemy) setSpawnPosition(
+	player Player,
+) {
+	positions := []string{}
+
+	// Делаем, что бы враги не спавнились прямо около игрока.
+	if player.X > 5 {
+		positions = append(positions, "left")
+	}
+
+	if player.X < config.CountPointX-1-5 {
+		positions = append(positions, "right")
+	}
+
+	if player.Y > 5 {
+		positions = append(positions, "top")
+	}
+
+	if player.Y < config.CountPointY-1-5 {
+		positions = append(positions, "bottom")
 	}
 
 	position := positions[rand.Intn(len(positions)-1)]

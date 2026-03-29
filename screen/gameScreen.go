@@ -45,7 +45,10 @@ func NewGameScreen(
 func (gs *gameScreen) createEnemies() {
 
 	for range config.CountEnemies {
-		gs.Enemies = append(gs.Enemies, model.NewEnemy())
+		gs.Enemies = append(
+			gs.Enemies,
+			model.NewEnemy(gs.Player),
+		)
 	}
 
 }
@@ -155,7 +158,10 @@ func (gs *gameScreen) killEnemy() {
 	gs.Enemies = enemies
 
 	for range deleteEnemiesIndex {
-		gs.Enemies = append(gs.Enemies, model.NewEnemy())
+		gs.Enemies = append(
+			gs.Enemies,
+			model.NewEnemy(gs.Player),
+		)
 	}
 	gs.Shots = shots
 
@@ -188,7 +194,6 @@ func (gs *gameScreen) Shot() {
 func (gs *gameScreen) DrawShots(
 	screenH *ebiten.Image,
 ) {
-
 	for _, shot := range gs.Shots {
 		vector.FillRect(
 			screenH,
@@ -196,10 +201,9 @@ func (gs *gameScreen) DrawShots(
 			float32(shot.Y),
 			float32(config.ShotSize),
 			float32(config.ShotSize),
-			color.RGBA{0xFF, 0xFF, 0xFF, 0x00},
+			color.RGBA{0xFF, 0xFF, 0xFF, 0xFF},
 			false,
 		)
-
 	}
 }
 
