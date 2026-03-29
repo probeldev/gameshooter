@@ -12,12 +12,14 @@ const (
 	ShotSize     = 10
 	WindowWidth  = 1280
 	WindowHeight = 860
-	MoveTime     = 45
+
+	MoveEnemyPixel = 2
 
 	ShotSpeed = 15
 	ShotDelay = 10
 
 	MegaShotSpeed = 15
+	MegaShotDelay = 120
 
 	CountPointX = WindowWidth / PointSize
 	CountPointY = WindowHeight / PointSize

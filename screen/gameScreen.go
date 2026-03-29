@@ -57,9 +57,7 @@ func (gs *gameScreen) createEnemies() {
 
 func (gs *gameScreen) Update() error {
 
-	if gs.needsToMoveEnemy() {
-		gs.moveEnemy()
-	}
+	gs.moveEnemy()
 
 	if gs.isStopGame() {
 		gs.changeScreenFunc(config.ScreenTypeGameOver)
@@ -80,7 +78,10 @@ func (gs *gameScreen) Update() error {
 		gs.Player.Up()
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	// if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	// 	gs.MegaShotRun()
+	// }
+	if gs.needsToMegaShot() {
 		gs.MegaShotRun()
 	}
 	if gs.needsToShot() {
@@ -256,15 +257,11 @@ func (gs *gameScreen) Draw(
 
 	screenH.Fill(color.RGBA{0x00, 0x33, 0x00, 0xFF})
 
-	pointSize := float32(config.PointSize)
+	gs.DrawEnemies(screenH)
 
 	gs.DrawPlayer(screenH)
 	gs.DrawShots(screenH)
 	gs.DrawMegaShot(screenH)
-
-	for _, enemy := range gs.Enemies {
-		vector.FillRect(screenH, float32(enemy.X)*pointSize, float32(enemy.Y)*pointSize, pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
-	}
 
 	scoreText := "Score: " + strconv.Itoa(gs.scope.Value)
 	text.Draw(screenH, scoreText, config.GameFont, 10, 30, color.White)
@@ -277,6 +274,15 @@ func (gs *gameScreen) Shot() {
 func (gs *gameScreen) MegaShotRun() {
 	// TODO: Перезаписывает предыдущий MegaShot, стоит переделать.
 	gs.MegaShot = model.NewMegaShotFull(gs.Player)
+}
+
+func (gs *gameScreen) DrawEnemies(
+	screenH *ebiten.Image,
+) {
+	pointSize := float32(config.PointSize)
+	for _, enemy := range gs.Enemies {
+		vector.FillRect(screenH, float32(enemy.X), float32(enemy.Y), pointSize, pointSize, color.RGBA{0xFF, 0x00, 0x00, 0xff}, false)
+	}
 }
 
 func (gs *gameScreen) DrawShots(
@@ -345,19 +351,21 @@ func (gs *gameScreen) DrawPlayer(
 
 }
 
-func (gs *gameScreen) needsToMoveEnemy() bool {
-	return gs.timer%config.MoveTime == 0
-}
-
 func (gs *gameScreen) needsToShot() bool {
 	return gs.timer%config.ShotDelay == 0
+}
+
+func (gs *gameScreen) needsToMegaShot() bool {
+	return gs.timer%config.MegaShotDelay == 0
 }
 
 func (gs *gameScreen) isStopGame() bool {
 
 	for _, enemy := range gs.Enemies {
-		deltaX := gs.Player.X - enemy.X
-		deltaY := gs.Player.Y - enemy.Y
+
+		// TODO:переделать, сейчас не работает. т.к. враги ходят не по клеткам
+		deltaX := gs.Player.X - enemy.X/60
+		deltaY := gs.Player.Y - enemy.Y/60
 
 		if deltaX == 0 && deltaY == 0 {
 			return true
@@ -371,8 +379,8 @@ func (gs *gameScreen) isStopGame() bool {
 func (gs *gameScreen) moveEnemy() {
 
 	for i := range gs.Enemies {
-		deltaX := gs.Player.X - gs.Enemies[i].X
-		deltaY := gs.Player.Y - gs.Enemies[i].Y
+		deltaX := gs.Player.X - gs.Enemies[i].X/config.PointSize
+		deltaY := gs.Player.Y - gs.Enemies[i].Y/config.PointSize
 
 		if math.Abs(float64(deltaX)) > math.Abs(float64(deltaY)) {
 			if deltaX > 0 {
@@ -389,6 +397,7 @@ func (gs *gameScreen) moveEnemy() {
 		}
 
 		// Если эта координата уже занята другим врагом - возвращаем предыдущую позицию
+		// TODO: Сейчас эта логика не работает.
 		for j, enemy := range gs.Enemies {
 			if i == j {
 				continue

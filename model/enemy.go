@@ -49,15 +49,15 @@ func (e *Enemy) setSpawnPosition(
 	switch position {
 	case "left":
 		e.X = 0
-		e.Y = rand.Intn(config.CountPointY - 1)
+		e.Y = rand.Intn(config.WindowHeight - 1)
 	case "right":
 		e.X = config.CountPointX - 1
-		e.Y = rand.Intn(config.CountPointY - 1)
+		e.Y = rand.Intn(config.WindowHeight - 1)
 	case "top":
-		e.X = rand.Intn(config.CountPointX - 1)
+		e.X = rand.Intn(config.WindowWidth - 1)
 		e.Y = 0
 	case "bottom":
-		e.X = rand.Intn(config.CountPointX - 1)
+		e.X = rand.Intn(config.WindowWidth - 1)
 		e.Y = config.CountPointX - 1
 	}
 }
@@ -67,15 +67,15 @@ func (e *Enemy) Left() {
 	if e.X == 0 {
 		return
 	}
-	e.X--
+	e.X -= config.MoveEnemyPixel
 }
 
 func (e *Enemy) Right() {
 	e.savePrev()
-	if e.X == config.CountPointX-1 {
+	if e.X == config.WindowWidth-1 {
 		return
 	}
-	e.X++
+	e.X += config.MoveEnemyPixel
 }
 
 func (e *Enemy) Up() {
@@ -83,16 +83,15 @@ func (e *Enemy) Up() {
 	if e.Y == 0 {
 		return
 	}
-	e.Y--
+	e.Y -= config.MoveEnemyPixel
 }
 
 func (e *Enemy) Down() {
 	e.savePrev()
-	if e.Y == config.CountPointY-1 {
-
+	if e.Y == config.WindowHeight-1 {
 		return
 	}
-	e.Y++
+	e.Y += config.MoveEnemyPixel
 }
 
 func (e *Enemy) savePrev() {
@@ -108,11 +107,11 @@ func (e *Enemy) BackMove() {
 }
 
 func (e *Enemy) IsKillShot(shot Shot) bool {
-	enemyStartX := e.X * config.PointSize
-	enemyEndX := (e.X + 1) * config.PointSize
+	enemyStartX := e.X
+	enemyEndX := (e.X + config.PointSize)
 
-	enemyStartY := e.Y * config.PointSize
-	enemyEndY := (e.Y + 1) * config.PointSize
+	enemyStartY := e.Y
+	enemyEndY := (e.Y + config.PointSize)
 
 	if shot.X > enemyStartX && shot.X < enemyEndX &&
 		shot.Y > enemyStartY && shot.Y < enemyEndY {
@@ -123,11 +122,11 @@ func (e *Enemy) IsKillShot(shot Shot) bool {
 }
 
 func (e *Enemy) IsKillMegaShot(shot MegaShot) bool {
-	enemyStartX := e.X * config.PointSize
-	enemyEndX := (e.X + 1) * config.PointSize
+	enemyStartX := e.X
+	enemyEndX := e.X + config.PointSize
 
-	enemyStartY := e.Y * config.PointSize
-	enemyEndY := (e.Y + 1) * config.PointSize
+	enemyStartY := e.Y
+	enemyEndY := e.Y + config.PointSize
 
 	if shot.X > enemyStartX && shot.X < enemyEndX &&
 		shot.Y > enemyStartY && shot.Y < enemyEndY {
