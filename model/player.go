@@ -32,38 +32,48 @@ func (p *Player) setSpawnPosition() {
 }
 
 func (p *Player) Left() {
+	if p.GunPosition != GunPositionTypeLeft {
+		p.GunPosition = GunPositionTypeLeft
+		return
+	}
+
 	if p.X == 0 {
 		return
 	}
 	p.X--
-
-	p.GunPosition = GunPositionTypeLeft
 }
 
 func (p *Player) Right() {
+	if p.GunPosition != GunPositionTypeRight {
+		p.GunPosition = GunPositionTypeRight
+		return
+	}
 	if p.X == config.CountPointX-1 {
 		return
 	}
 	p.X++
-
-	p.GunPosition = GunPositionTypeRight
 }
 
 func (p *Player) Up() {
+	if p.GunPosition != GunPositionTypeTop {
+		p.GunPosition = GunPositionTypeTop
+		return
+	}
 	if p.Y == 0 {
 		return
 	}
 	p.Y--
 
-	p.GunPosition = GunPositionTypeTop
 }
 
 func (p *Player) Down() {
+	if p.GunPosition != GunPositionTypeBottom {
+		p.GunPosition = GunPositionTypeBottom
+		return
+	}
 	if p.Y == config.CountPointY-1 {
 
 		return
 	}
 	p.Y++
-
-	p.GunPosition = GunPositionTypeBottom
 }
