@@ -73,7 +73,7 @@ func (s *Shot) Move() {
 	case DirectionTypeLeft:
 		s.X -= config.ShotSpeed
 	case DirectionTypeRight:
-		s.X += config.ShotSize
+		s.X += config.ShotSpeed
 	}
 }
 

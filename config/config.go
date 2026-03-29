@@ -7,14 +7,15 @@ import (
 )
 
 const (
-	PointSize    = 60
+	PointSize    = 40
 	GunSize      = 10
 	ShotSize     = 10
 	WindowWidth  = 1280
 	WindowHeight = 860
 	MoveTime     = 45
 
-	ShotSpeed = 10
+	ShotSpeed = 15
+	ShotDelay = 10
 
 	CountPointX = WindowWidth / PointSize
 	CountPointY = WindowHeight / PointSize

@@ -78,7 +78,10 @@ func (gs *gameScreen) Update() error {
 		gs.Player.Up()
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	// if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+	// 	gs.Shot()
+	// }
+	if gs.needsToShot() {
 		gs.Shot()
 	}
 
@@ -94,7 +97,6 @@ func (gs *gameScreen) moveShots() {
 
 	for i := range gs.Shots {
 		gs.Shots[i].Move()
-
 	}
 
 	shots := []model.Shot{}
@@ -244,6 +246,10 @@ func (gs *gameScreen) DrawPlayer(
 
 func (gs *gameScreen) needsToMoveEnemy() bool {
 	return gs.timer%config.MoveTime == 0
+}
+
+func (gs *gameScreen) needsToShot() bool {
+	return gs.timer%config.ShotDelay == 0
 }
 
 func (gs *gameScreen) isStopGame() bool {
