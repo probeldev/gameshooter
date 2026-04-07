@@ -45,8 +45,8 @@ func NewMegaShot(
 	pointSize := config.PlayerSize
 
 	shotSize := config.GunSize
-	playerStartX := player.X * pointSize
-	playerStartY := player.Y * pointSize
+	playerStartX := int(player.X)
+	playerStartY := int(player.Y)
 
 	switch direction {
 	case DirectionMegaShotTypeTop:

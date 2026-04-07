@@ -14,6 +14,7 @@ const (
 	WindowWidth  = 1280
 	WindowHeight = 860
 
+	PlayerSpeed    = 3
 	MoveEnemyPixel = 1
 
 	ShotSpeed = 15

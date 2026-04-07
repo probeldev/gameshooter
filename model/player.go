@@ -12,8 +12,8 @@ const (
 )
 
 type Player struct {
-	X           int
-	Y           int
+	X           float64
+	Y           float64
 	GunPosition GunPositionType
 }
 
@@ -27,8 +27,8 @@ func NewPlayer() Player {
 }
 
 func (p *Player) setSpawnPosition() {
-	p.X = config.CountPointX / 2
-	p.Y = config.CountPointY / 2
+	p.X = float64(config.CountPointX / 2 * config.PlayerSize)
+	p.Y = float64(config.CountPointY / 2 * config.PlayerSize)
 }
 
 func (p *Player) Left() {
@@ -37,10 +37,13 @@ func (p *Player) Left() {
 		return
 	}
 
-	if p.X == 0 {
+	if p.X <= 0 {
 		return
 	}
-	p.X--
+	p.X -= config.PlayerSpeed
+	if p.X < 0 {
+		p.X = 0
+	}
 }
 
 func (p *Player) Right() {
@@ -48,10 +51,13 @@ func (p *Player) Right() {
 		p.GunPosition = GunPositionTypeRight
 		return
 	}
-	if p.X == config.CountPointX-1 {
+	if p.X >= config.WindowWidth-config.PlayerSize {
 		return
 	}
-	p.X++
+	p.X += config.PlayerSpeed
+	if p.X > config.WindowWidth-config.PlayerSize {
+		p.X = config.WindowWidth - config.PlayerSize
+	}
 }
 
 func (p *Player) Up() {
@@ -59,11 +65,13 @@ func (p *Player) Up() {
 		p.GunPosition = GunPositionTypeTop
 		return
 	}
-	if p.Y == 0 {
+	if p.Y <= 0 {
 		return
 	}
-	p.Y--
-
+	p.Y -= config.PlayerSpeed
+	if p.Y < 0 {
+		p.Y = 0
+	}
 }
 
 func (p *Player) Down() {
@@ -71,9 +79,11 @@ func (p *Player) Down() {
 		p.GunPosition = GunPositionTypeBottom
 		return
 	}
-	if p.Y == config.CountPointY-1 {
-
+	if p.Y >= config.WindowHeight-config.PlayerSize {
 		return
 	}
-	p.Y++
+	p.Y += config.PlayerSpeed
+	if p.Y > config.WindowHeight-config.PlayerSize {
+		p.Y = config.WindowHeight - config.PlayerSize
+	}
 }

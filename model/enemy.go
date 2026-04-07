@@ -28,19 +28,19 @@ func (e *Enemy) setSpawnPosition(
 	positions := []string{}
 
 	// Делаем, что бы враги не спавнились прямо около игрока.
-	if player.X > 5 {
+	if player.X > float64(5*config.PlayerSize) {
 		positions = append(positions, "left")
 	}
 
-	if player.X < config.CountPointX-1-5 {
+	if player.X < float64(config.WindowWidth-5*config.PlayerSize) {
 		positions = append(positions, "right")
 	}
 
-	if player.Y > 5 {
+	if player.Y > float64(5*config.PlayerSize) {
 		positions = append(positions, "top")
 	}
 
-	if player.Y < config.CountPointY-1-5 {
+	if player.Y < float64(config.WindowHeight-5*config.PlayerSize) {
 		positions = append(positions, "bottom")
 	}
 
@@ -51,14 +51,14 @@ func (e *Enemy) setSpawnPosition(
 		e.X = 0
 		e.Y = rand.Intn(config.WindowHeight - 1)
 	case "right":
-		e.X = config.CountPointX - 1
+		e.X = config.WindowWidth - config.PlayerSize
 		e.Y = rand.Intn(config.WindowHeight - 1)
 	case "top":
 		e.X = rand.Intn(config.WindowWidth - 1)
 		e.Y = 0
 	case "bottom":
 		e.X = rand.Intn(config.WindowWidth - 1)
-		e.Y = config.CountPointX - 1
+		e.Y = config.WindowHeight - config.PlayerSize
 	}
 }
 

@@ -9,7 +9,6 @@ import (
 	"github.com/probeldev/gameshooter/scope"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
@@ -63,17 +62,20 @@ func (gs *gameScreen) Update() error {
 		return nil
 	}
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyH) {
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) ||
+		ebiten.IsKeyPressed(ebiten.KeyH) {
 		gs.Player.Left()
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowRight) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyL) {
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) ||
+		ebiten.IsKeyPressed(ebiten.KeyL) {
 		gs.Player.Right()
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowDown) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyJ) {
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) ||
+		ebiten.IsKeyPressed(ebiten.KeyJ) {
 		gs.Player.Down()
-	} else if inpututil.IsKeyJustPressed(ebiten.KeyArrowUp) ||
-		inpututil.IsKeyJustPressed(ebiten.KeyK) {
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) ||
+		ebiten.IsKeyPressed(ebiten.KeyK) {
 		gs.Player.Up()
 	}
 
@@ -354,8 +356,8 @@ func (gs *gameScreen) DrawPlayer(
 
 	pointSize := float32(config.PlayerSize)
 
-	playerStartX := float32(gs.Player.X) * pointSize
-	playerStartY := float32(gs.Player.Y) * pointSize
+	playerStartX := float32(gs.Player.X)
+	playerStartY := float32(gs.Player.Y)
 
 	var gunPositionX float32 = 0
 	var gunPositionY float32 = 0
@@ -393,16 +395,16 @@ func (gs *gameScreen) needsToMegaShot() bool {
 
 func (gs *gameScreen) isStopGame() bool {
 	// Вычисляем границы игрока один раз перед циклом
-	playerStartX := gs.Player.X * config.PlayerSize
-	playerEndX := gs.Player.X*config.PlayerSize + config.PlayerSize
-	playerStartY := gs.Player.Y * config.PlayerSize
-	playerEndY := gs.Player.Y*config.PlayerSize + config.PlayerSize
+	playerStartX := gs.Player.X
+	playerEndX := gs.Player.X + config.PlayerSize
+	playerStartY := gs.Player.Y
+	playerEndY := gs.Player.Y + config.PlayerSize
 
 	for _, enemy := range gs.Enemies {
-		enemyStartX := enemy.X
-		enemyEndX := enemy.X + config.EnemySize
-		enemyStartY := enemy.Y
-		enemyEndY := enemy.Y + config.EnemySize
+		enemyStartX := float64(enemy.X)
+		enemyEndX := float64(enemy.X + config.EnemySize)
+		enemyStartY := float64(enemy.Y)
+		enemyEndY := float64(enemy.Y + config.EnemySize)
 
 		// Проверка пересечения двух прямоугольников (AABB collision)
 		// Прямоугольники НЕ пересекаются, если один из них:
@@ -421,8 +423,8 @@ func (gs *gameScreen) isStopGame() bool {
 
 func (gs *gameScreen) moveEnemy() {
 	for i := range gs.Enemies {
-		deltaX := gs.Player.X*config.PlayerSize - gs.Enemies[i].X
-		deltaY := gs.Player.Y*config.PlayerSize - gs.Enemies[i].Y
+		deltaX := int(gs.Player.X) - gs.Enemies[i].X
+		deltaY := int(gs.Player.Y) - gs.Enemies[i].Y
 
 		// Двигаем по оси с наибольшей разницей
 		if abs(deltaX) > abs(deltaY) {
