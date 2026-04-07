@@ -107,33 +107,33 @@ func (e *Enemy) BackMove() {
 }
 
 func (e *Enemy) IsKillShot(shot Shot) bool {
-	// TODO: реализовать проверку через ААББ колизию
-	enemyStartX := e.X
-	enemyEndX := (e.X + config.PlayerSize)
+	// AABB collision between enemy and shot
+	enemyLeft := e.X
+	enemyRight := e.X + config.PlayerSize
+	enemyTop := e.Y
+	enemyBottom := e.Y + config.PlayerSize
 
-	enemyStartY := e.Y
-	enemyEndY := (e.Y + config.PlayerSize)
+	shotLeft := shot.X
+	shotRight := shot.X + config.ShotSize
+	shotTop := shot.Y
+	shotBottom := shot.Y + config.ShotSize
 
-	if shot.X > enemyStartX && shot.X < enemyEndX &&
-		shot.Y > enemyStartY && shot.Y < enemyEndY {
-		return true
-	}
-
-	return false
+	return enemyLeft < shotRight && enemyRight > shotLeft &&
+		enemyTop < shotBottom && enemyBottom > shotTop
 }
 
 func (e *Enemy) IsKillMegaShot(shot MegaShot) bool {
-	// TODO: реализовать проверку через ААББ колизию
-	enemyStartX := e.X
-	enemyEndX := e.X + config.PlayerSize
+	// AABB collision between enemy and mega shot
+	enemyLeft := e.X
+	enemyRight := e.X + config.PlayerSize
+	enemyTop := e.Y
+	enemyBottom := e.Y + config.PlayerSize
 
-	enemyStartY := e.Y
-	enemyEndY := e.Y + config.PlayerSize
+	shotLeft := shot.X
+	shotRight := shot.X + config.ShotSize
+	shotTop := shot.Y
+	shotBottom := shot.Y + config.ShotSize
 
-	if shot.X > enemyStartX && shot.X < enemyEndX &&
-		shot.Y > enemyStartY && shot.Y < enemyEndY {
-		return true
-	}
-
-	return false
+	return enemyLeft < shotRight && enemyRight > shotLeft &&
+		enemyTop < shotBottom && enemyBottom > shotTop
 }
